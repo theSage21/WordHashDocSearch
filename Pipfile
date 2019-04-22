@@ -1,0 +1,21 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+blingfire = "*"
+pandas = "*"
+sklearn = "*"
+scipy = "*"
+numpy = "*"
+pip = "==18.0"
+squad-df = "*"
+ipython = "*"
+jupyter = "*"
+tqdm = "*"
+
+[dev-packages]
+
+[requires]
+python_version = "3.6"
