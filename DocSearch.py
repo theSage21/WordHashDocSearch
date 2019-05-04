@@ -36,17 +36,18 @@ all_letters = [
 
 
 class CharIdf:
-    def __init__(self, ngrams=3):
+    def __init__(self, all_letters, ngrams=3):
         self.ngrams = ngrams
-        global all_letters
+        self.all_letters = list(set(all_letters))
         self.grams = []
         for i in range(1, ngrams + 1):
-            self.grams += ["".join(i) for i in permutations(all_letters, i)]
+            self.grams += ["".join(i) for i in permutations(self.all_letters, i)]
         self.gram_length = len(self.grams)
         self.gram_to_index = {gram: index for index, gram in enumerate(self.grams)}
 
     def _make_grams(self, word):
-        word = list(word)
+        # skip those chars which you know nothing about
+        word = [i for i in word if i in self.all_letters]
         for i in range(len(word)):
             for j in range(i, i + self.ngrams):
                 yield "".join(word[i : j + 1])
@@ -79,11 +80,8 @@ class CharIdf:
         self.fit(docs)
         return self.transform(docs)
 
-
 vec = CharIdf()
 docs = list(set(df.context))
 x = vec.fit_transform(docs)
 qv = vec.transform(df.question)
-
-
 result = np.einsum("kd,md->km", x, qv)
