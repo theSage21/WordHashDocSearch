@@ -1,10 +1,7 @@
 import pandas as pd
-import numpy as np
 from squad_df import v2
-from collections import Counter, defaultdict
-from blingfire import text_to_words
-from tqdm import tqdm_notebook
-from itertools import permutations
+from word_hash import CharIdf
+from collections import Counter
 
 
 def build(df):
@@ -34,54 +31,11 @@ all_letters = [
     if count > 1000
 ]
 
-
-class CharIdf:
-    def __init__(self, all_letters, ngrams=3):
-        self.ngrams = ngrams
-        self.all_letters = list(set(all_letters))
-        self.grams = []
-        for i in range(1, ngrams + 1):
-            self.grams += ["".join(i) for i in permutations(self.all_letters, i)]
-        self.gram_length = len(self.grams)
-        self.gram_to_index = {gram: index for index, gram in enumerate(self.grams)}
-
-    def _make_grams(self, word):
-        # skip those chars which you know nothing about
-        word = [i for i in word if i in self.all_letters]
-        for i in range(len(word)):
-            for j in range(i, i + self.ngrams):
-                yield "".join(word[i : j + 1])
-
-    def __getitem__(self, word, cache={}):
-        if word not in cache:
-            vec = np.zeros(self.gram_length)
-            for gram in self._make_grams(word):
-                if gram in self.gram_to_index:
-                    vec[self.gram_to_index[gram]] += 1
-            cache[word] = vec
-        return cache[word]
-
-    def fit(self, docs):
-        self.idf = defaultdict(int)
-        for doc in docs:
-            for word in set(text_to_words(doc)):
-                self.idf[word] += 1
-
-    def transform(self, docs):
-        docvecs = np.zeros((len(docs), self.gram_length))
-        print("making vectors")
-        for index, doc in enumerate(tqdm_notebook(docs)):
-            for word, count in Counter(text_to_words(doc)).items():
-                v = (self[word] * count) / (1 + self.idf[word])
-                docvecs[index] += v
-        return docvecs
-
-    def fit_transform(self, docs):
-        self.fit(docs)
-        return self.transform(docs)
-
-vec = CharIdf()
+vec = CharIdf(all_letters)
 docs = list(set(df.context))
 x = vec.fit_transform(docs)
 qv = vec.transform(df.question)
-result = np.einsum("kd,md->km", x, qv)
+result = pd.np.argmax(pd.np.einsum("kd,md->km", x, qv), axis=1)
+print('documents', x.shape)
+print('questions', qv.shape)
+print('matches  ', result.shape)
