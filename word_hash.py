@@ -6,7 +6,7 @@ from itertools import permutations
 
 
 class CharIdf:
-    def __init__(self, all_letters, ngrams=3, tokenizer=text_to_words):
+    def __init__(self, all_letters, ngrams=2, tokenizer=text_to_words):
         self.ngrams = ngrams
         self.all_letters = list(set(all_letters))
         self.grams = []
@@ -54,7 +54,8 @@ class CharIdf:
         self.fit(docs)
         return self.transform(docs)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     vec = CharIdf()
     docs = list(set(df.context))
     x = vec.fit_transform(docs)
