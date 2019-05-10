@@ -2,7 +2,7 @@ import numpy as np
 from collections import Counter, defaultdict
 from blingfire import text_to_words
 from tqdm import tqdm
-from itertools import permutations
+from itertools import product
 
 
 class CharIdf:
@@ -10,11 +10,12 @@ class CharIdf:
         self.ngrams = ngrams
         self.all_letters = list(set(all_letters))
         self.grams = []
-        for i in range(1, ngrams + 1):
-            self.grams += ["".join(i) for i in permutations(self.all_letters, i)]
+        for n in range(1, self.ngrams + 1):
+            self.grams += ["".join(i) for i in product(self.all_letters, repeat=n)]
         self.gram_length = len(self.grams)
         self.gram_to_index = {gram: index for index, gram in enumerate(self.grams)}
         self.tokenizer = tokenizer
+        self.cache = {}
 
     def _make_grams(self, word):
         "Make char n-grams from words"
@@ -24,30 +25,31 @@ class CharIdf:
             for j in range(i, i + self.ngrams):
                 yield "".join(word[i : j + 1])
 
-    def __getitem__(self, word, cache={}):
+    def __getitem__(self, word):
         "Get a word's vector"
-        if word not in cache:
+        if word not in self.cache:
             vec = np.zeros(self.gram_length)
             for gram in self._make_grams(word):
                 if gram in self.gram_to_index:
                     vec[self.gram_to_index[gram]] += 1
-            cache[word] = vec
-        return cache[word]
+            self.cache[word] = vec
+        return self.cache[word] / self.idf
 
     def fit(self, docs):
         "Learn idfs"
-        self.idf = defaultdict(int)
+        self.idf = np.ones(self.gram_length)
+        self.cache = {}
         for doc in docs:
             for word in set(self.tokenizer(doc)):
-                self.idf[word] += 1
+                for gram in self._make_grams(word):
+                    self.idf[self.gram_to_index[gram]] += 1
 
     def transform(self, docs):
         "Get vectors for list of strings"
         docvecs = np.zeros((len(docs), self.gram_length))
         for index, doc in enumerate(tqdm(docs)):
             for word, count in Counter(self.tokenizer(doc)).items():
-                v = (self[word] * count) / (1 + self.idf[word])
-                docvecs[index] += v
+                docvecs[index] += self[word]
         return docvecs
 
     def fit_transform(self, docs):

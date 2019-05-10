@@ -15,6 +15,7 @@ ipython = "*"
 jupyter = "*"
 tqdm = "*"
 seaborn = "*"
+matplotlib = "*"
 
 [dev-packages]
 
