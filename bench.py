@@ -27,13 +27,14 @@ df = pd.DataFrame(list(v2))
 df = df.loc[df.is_train]
 df = df.sample(df.shape[0])
 df = df.reset_index()
-df = df[:1000]  # keep it small for now
+df = df[:100]  # keep it small for now
 all_text = "".join(text_to_words(" ".join(df.context).lower()))
 all_letters = [letter for letter, count in Counter(all_text).most_common(50)]
 print(all_letters)
 print(f"{len(all_letters)} letters")
 
 vec = CharIdf(all_letters)
+print(vec.gram_length)
 docs = list(set(df.context))
 expected_indices = np.array([docs.index(doc) for doc in df.context])
 x = vec.fit_transform(docs)

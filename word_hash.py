@@ -4,9 +4,12 @@ from blingfire import text_to_words
 from tqdm import tqdm
 from itertools import product
 
+def tokenizer(string):
+    return text_to_words(string).split(' ')
+
 
 class CharIdf:
-    def __init__(self, all_letters, ngrams=2, tokenizer=text_to_words):
+    def __init__(self, all_letters, ngrams=3, tokenizer=tokenizer):
         self.ngrams = ngrams
         self.all_letters = list(set(all_letters))
         self.grams = []
