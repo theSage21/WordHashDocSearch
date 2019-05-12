@@ -1,8 +1,9 @@
 import numpy as np
-from collections import Counter, defaultdict
-from blingfire import text_to_words
 from tqdm import tqdm
 from itertools import product
+from blingfire import text_to_words
+from collections import Counter, defaultdict
+
 
 def tokenizer(string):
     return text_to_words(string).split(' ')
