@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 from squad_df import v2
+from sklearn.metrics.pairwise import linear_kernel
 from sklearn.feature_extraction.text import TfidfVectorizer
 from word_hash import CharIdf
 from collections import Counter
@@ -40,7 +41,6 @@ expected_indices = np.array([docs.index(doc) for doc in df.context])
 x = vec.fit_transform(docs)
 qv = vec.transform(df.question)
 # result = pd.np.argmax(pd.np.einsum("kd,md->km", x, qv), axis=0)
-from sklearn.metrics.pairwise import linear_kernel
 result = linear_kernel(x, qv)
 # result = pd.np.argmax(pd.np.einsum("kd,md->km", x, qv), axis=0)
 print("documents", x.shape)
