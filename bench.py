@@ -15,7 +15,8 @@ import matplotlib.pyplot as plt
 plt.style.use('ggplot')
 
 
-def measure(part):
+def measure(args):
+    part, sample_size = args
     all_text = "".join(text_to_words(" ".join(part.context).lower()))
     all_letters = [letter for letter, count in Counter(all_text).most_common(50)]
     vec = CharIdf(all_letters)
@@ -25,6 +26,7 @@ def measure(part):
     qv = vec.transform(part.question)
     result = linear_kernel(x, qv)
     result = pd.np.argmax(result, axis=0)
+    vec_spread = x.std(axis=0).mean()
     char_correct = (result == expected_indices).mean()
     # -------------
     vec = TfidfVectorizer()
@@ -35,27 +37,30 @@ def measure(part):
     result = linear_kernel(x, qv)
     result = pd.np.argmax(result, axis=0)
     tfidf_correct = (result == expected_indices).mean()
-    return char_correct, tfidf_correct
+    return char_correct, tfidf_correct, vec_spread, sample_size
 
 df = pd.DataFrame(list(v2))
 df = df.loc[df.is_train]
 char_correct = []
 tfidf_correct = []
 samples = []
-bootstrap = 1000
-for sample_size in tqdm([10, 50, 100, 150, 200, 300, 600, 1000], desc='Sample size'):
-    args = []
-    for bootstrap in tqdm(range(bootstrap), desc='sampling'):
+vec_spread = []
+bootstrap = 50
+sample_sizes = [10, 50, 100, 150, 200, 300, 500, 1000]
+args = []
+for bootstrap in tqdm(range(bootstrap), desc='Building Args'):
+    for sample_size in sample_sizes:
         part = df.sample(df.shape[0])
         part = part.reset_index()
         part = part[:sample_size]
-        args.append(part.copy())
-    with Pool() as pool:
-        work = pool.imap_unordered(measure, args)
-        for a, b in tqdm(work,total=len(args), desc='Work'):
-            char_correct.append(a)
-            tfidf_correct.append(b)
-            samples.append(sample_size)
+        args.append((part.copy(), sample_size))
+with Pool() as pool:
+    work = pool.imap_unordered(measure, args)
+    for a, b, c, sample_size in tqdm(work,total=len(args), desc='Work'):
+        char_correct.append(a)
+        tfidf_correct.append(b)
+        vec_spread.append(c)
+        samples.append(sample_size)
 
-df = pd.DataFrame({'char': char_correct, 'tfidf': tfidf_correct, 'samples': samples})
-df.to_csv('results.csv')
+df = pd.DataFrame({'char': char_correct, 'tfidf': tfidf_correct, 'samples': samples, 'vec_spread': vec_spread})
+df.to_csv('results.csv', index=False)
