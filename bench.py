@@ -50,12 +50,12 @@ for sample_size in [10, 50, 100, 150, 200, 300, 600, 1000]:
         part = part.reset_index()
         part = part[:sample_size]
         args.append(part.copy())
-    samples.append(sample_size)
     with Pool() as pool:
         work = pool.imap_unordered(measure, args)
         for a, b in tqdm(work,total=len(args), desc='Work'):
             char_correct.append(a)
             tfidf_correct.append(b)
+            samples.append(sample_size)
 
 df = pd.DataFrame({'char': char_correct, 'tfidf': tfidf_correct, 'samples': samples})
 df.to_csv('results.csv')
