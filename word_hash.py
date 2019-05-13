@@ -34,7 +34,7 @@ class CharIdf:
         vec = np.zeros(self.gram_length)
         for gram in self._make_grams(word):
             if gram in self.gram_to_index:
-                vec[self.gram_to_index[gram]] += 1
+                vec[self.gram_to_index[gram]] += len(gram)
         return vec / self.idf
 
     def fit(self, docs):
