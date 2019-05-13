@@ -43,7 +43,7 @@ char_correct = []
 tfidf_correct = []
 samples = []
 bootstrap = 1000
-for sample_size in [10, 50, 100, 150, 200, 300, 600, 1000]:
+for sample_size in tqdm([10, 50, 100, 150, 200, 300, 600, 1000], desc='Sample size'):
     args = []
     for bootstrap in tqdm(range(bootstrap), desc='sampling'):
         part = df.sample(df.shape[0])
