@@ -42,7 +42,7 @@ df = df.loc[df.is_train]
 char_correct = []
 tfidf_correct = []
 samples = []
-bootstrap = 100
+bootstrap = 1000
 for sample_size in [10, 50, 100, 150, 200, 300, 600, 1000]:
     args = []
     for bootstrap in tqdm(range(bootstrap), desc='sampling'):
