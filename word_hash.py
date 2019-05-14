@@ -10,7 +10,7 @@ def tokenizer(string):
 
 
 class CharIdf:
-    def __init__(self, all_letters, ngrams=(2, 4), tokenizer=tokenizer, verbose=False):
+    def __init__(self, all_letters, ngrams=(1, 3), tokenizer=tokenizer, verbose=False):
         self.ngrams = ngrams
         self.all_letters = list(set(all_letters))
         self.grams = []
@@ -40,7 +40,7 @@ class CharIdf:
         for gram in self._make_grams(word):
             if gram in self.gram_to_index:
                 vec[self.gram_to_index[gram]] += len(gram)
-        return vec / self.idf
+        return vec
 
     def fit(self, docs):
         "Learn idfs"
