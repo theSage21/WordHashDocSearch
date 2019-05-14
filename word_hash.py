@@ -10,11 +10,11 @@ def tokenizer(string):
 
 
 class CharIdf:
-    def __init__(self, all_letters, ngrams=3, tokenizer=tokenizer, verbose=False):
+    def __init__(self, all_letters, ngrams=(2, 4), tokenizer=tokenizer, verbose=False):
         self.ngrams = ngrams
         self.all_letters = list(set(all_letters))
         self.grams = []
-        for n in range(1, self.ngrams + 1):
+        for n in range(self.ngrams[0], self.ngrams[1] + 1):
             self.grams += ["".join(i) for i in product(self.all_letters, repeat=n)]
         self.gram_length = len(self.grams)
         self.gram_to_index = {gram: index for index, gram in enumerate(self.grams)}
@@ -27,7 +27,7 @@ class CharIdf:
         # skip those chars which you know nothing about
         word = [i for i in word if i in self.all_letters]
         for i in range(len(word)):
-            for j in range(i, i + self.ngrams):
+            for j in range(i+self.ngrams[0], i + self.ngrams[1]):
                 yield "".join(word[i : j + 1])
 
     def __getitem__(self, word):
