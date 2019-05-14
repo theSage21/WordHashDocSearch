@@ -47,6 +47,7 @@ samples = []
 vec_spread = []
 bootstrap = 50
 sample_sizes = [10, 50, 100, 150, 200, 300, 500, 1000]
+sample_sizes = [10, 50, 100, 150]
 args = []
 for bootstrap in tqdm(range(bootstrap), desc='Building Args'):
     for sample_size in sample_sizes:
