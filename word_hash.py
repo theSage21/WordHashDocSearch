@@ -33,6 +33,7 @@ class CharIdf:
                 if w not in seen and (self.ngrams[0] <= len(w) <= self.ngrams[1]):
                     seen.add(w)
                     yield w
+        self.amplify = 1
 
     def __getitem__(self, word):
         "Get a word's vector"
@@ -49,6 +50,7 @@ class CharIdf:
             for word in set(self.tokenizer(doc)):
                 for gram in self._make_grams(word):
                     self.idf[self.gram_to_index[gram]] += 1
+        self.amplify = np.log(len(docs))
 
     def transform(self, docs):
         "Get vectors for list of strings"
@@ -56,7 +58,7 @@ class CharIdf:
         docs = tqdm(docs) if self.verbose else docs
         for index, doc in enumerate(docs):
             for word, count in Counter(self.tokenizer(doc)).items():
-                docvecs[index] += self[word]
+                docvecs[index] += self[word] ** self.amplify
         return docvecs
 
     def fit_transform(self, docs):
