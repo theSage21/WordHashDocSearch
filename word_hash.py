@@ -50,7 +50,7 @@ class CharIdf:
             for word in set(self.tokenizer(doc)):
                 for gram in self._make_grams(word):
                     self.idf[self.gram_to_index[gram]] += 1
-        self.amplify = np.log(len(docs)) / np.log(2)
+        self.amplify = np.log(len(docs))
 
     def transform(self, docs):
         "Get vectors for list of strings"
