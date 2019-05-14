@@ -57,7 +57,7 @@ class CharIdf:
         for index, doc in enumerate(docs):
             for word, count in Counter(self.tokenizer(doc)).items():
                 docvecs[index] += self[word]
-        return np.pow(docvecs, np.log(len(docs)))
+        return np.power(docvecs, np.log(len(docs)))
 
     def fit_transform(self, docs):
         self.fit(docs)
