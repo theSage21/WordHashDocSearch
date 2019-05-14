@@ -40,7 +40,7 @@ class CharIdf:
         for gram in self._make_grams(word):
             if gram in self.gram_to_index:
                 vec[self.gram_to_index[gram]] += len(gram)
-        return vec
+        return vec / self.idf
 
     def fit(self, docs):
         "Learn idfs"
@@ -57,6 +57,7 @@ class CharIdf:
         for index, doc in enumerate(docs):
             for word, count in Counter(self.tokenizer(doc)).items():
                 docvecs[index] += self[word]
+        np.pow(docvecs, np.log(len(docs))
         return docvecs
 
     def fit_transform(self, docs):
