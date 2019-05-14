@@ -26,9 +26,13 @@ class CharIdf:
         "Make char n-grams from words"
         # skip those chars which you know nothing about
         word = [i for i in word if i in self.all_letters]
+        seen = set()
         for i in range(len(word)):
             for j in range(i+self.ngrams[0], i + self.ngrams[1]):
-                yield "".join(word[i : j + 1])
+                w = "".join(word[i : j + 1])
+                if w not in seen and (self.ngrams[0] <= len(w) <= self.ngrams[1]):
+                    seen.add(w)
+                    yield w
 
     def __getitem__(self, word):
         "Get a word's vector"
