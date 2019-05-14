@@ -20,7 +20,7 @@ class CharIdf:
         self.gram_to_index = {gram: index for index, gram in enumerate(self.grams)}
         self.tokenizer = tokenizer
         self.verbose = verbose
-        self.epsilon = 1e-3
+        self.epsilon = 1
 
     def _make_grams(self, word):
         "Make char n-grams from words"
@@ -48,7 +48,7 @@ class CharIdf:
         for doc in docs:
             for word in set(self.tokenizer(doc)):
                 for gram in self._make_grams(word):
-                    self.idf[self.gram_to_index[gram]] += len(gram)
+                    self.idf[self.gram_to_index[gram]] += 1
 
     def transform(self, docs):
         "Get vectors for list of strings"
@@ -57,7 +57,7 @@ class CharIdf:
         for index, doc in enumerate(docs):
             for word, count in Counter(self.tokenizer(doc)).items():
                 docvecs[index] += self[word]
-        return np.power(docvecs, np.log(len(docs)))
+        return docvecs
 
     def fit_transform(self, docs):
         self.fit(docs)
